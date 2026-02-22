@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PT Manager">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>PT Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--surface:#181818;--surface2:#222;--border:#2e2e2e;--accent:#c8f135;--text:#f0f0f0;--muted:#888;--danger:#ff4444;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;padding-top:calc(12px + var(--safe-top));border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;z-index:100}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--accent);cursor:pointer}
+.logo span{color:var(--text)}
+.header-actions{display:flex;gap:8px;align-items:center}
+#app-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(70px + var(--safe-bottom))}
+.btn{padding:9px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;letter-spacing:.3px}
+.btn-primary{background:var(--accent);color:#0f0f0f}.btn-primary:active{background:#d4f84a;transform:scale(.97)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:active{color:var(--text)}
+.btn-danger{background:var(--danger);color:white}
+.btn-sm{padding:6px 12px;font-size:.78rem}.btn-icon{padding:8px 12px;font-size:.82rem}
+main{padding:16px;max-width:900px;margin:0 auto;width:100%}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--muted);margin-bottom:16px}
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:0;margin-bottom:20px}
+.back-btn:active{color:var(--accent)}
+
+/* BOTTOM NAV */
+.bottom-nav{display:flex;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;padding-bottom:var(--safe-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.62rem;font-weight:500;cursor:pointer;gap:3px;transition:color .15s}
+.nav-btn .nav-icon{font-size:1.2rem;line-height:1}.nav-btn.active{color:var(--accent)}
+
+/* HOME TILES */
+.home-greeting{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;margin-bottom:4px}
+.home-sub{font-size:.85rem;color:var(--muted);margin-bottom:24px}
+.home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.home-tile{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.home-tile:active{transform:scale(.97);border-color:var(--accent)}
+.home-tile.accent{background:var(--accent);border-color:var(--accent)}
+.home-tile.accent .tile-icon,.home-tile.accent .tile-label,.home-tile.accent .tile-sub{color:#0f0f0f}
+.tile-icon{font-size:2rem;line-height:1}
+.tile-label{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;color:var(--text)}
+.tile-sub{font-size:.72rem;color:var(--muted)}
+.home-tile-wide{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.home-tile-wide:active{border-color:var(--accent);transform:scale(.99)}
+.htw-icon{font-size:1.8rem;width:48px;text-align:center;flex-shrink:0}
+.htw-info{flex:1}
+.htw-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px}
+.htw-sub{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+/* STATS BAR */
+.stats-bar{display:flex;gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);line-height:1}
+.stat-label{font-size:.62rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+
+/* CLIENTS */
+.clients-grid{display:flex;flex-direction:column;gap:12px}
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;user-select:none}
+.client-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+.client-card:active{transform:scale(.99)}.client-card:active::before{transform:scaleX(1)}
+.client-card.drag-over{border-color:var(--accent);background:rgba(200,241,53,.05)}
+.client-card.dragging{opacity:.4}
+.card-top{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.drag-handle{color:var(--muted);font-size:1.2rem;padding:4px 6px;cursor:grab;flex-shrink:0;touch-action:none}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent);flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.client-name{font-size:1rem;font-weight:600}.client-meta{font-size:.76rem;color:var(--muted);margin-top:2px}
+.client-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tag{font-size:.68rem;padding:3px 9px;border-radius:20px;font-weight:500}
+.tag-goal{background:rgba(200,241,53,.12);color:var(--accent);border:1px solid rgba(200,241,53,.25)}
+.tag-warn{background:rgba(255,87,51,.12);color:#ff7a5c;border:1px solid rgba(255,87,51,.25)}
+.card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border)}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;flex:1}
+.search-bar input::placeholder{color:var(--muted)}
+.search-bar .search-icon{color:var(--muted);font-size:1.1rem;flex-shrink:0}
+.search-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;display:none}
+.template-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:.8rem;color:var(--text);transition:all .15s;margin:3px}
+.template-chip:active{border-color:var(--accent);color:var(--accent)}
+.template-chip .tc-del{color:var(--muted);font-size:.75rem;margin-left:2px}
+.template-chip .tc-del:hover{color:var(--danger)}
+.templates-section{margin-bottom:16px}
+.templates-section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+.add-card{background:transparent;border:2px dashed var(--border);border-radius:12px;padding:28px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px}
+.add-card:active{border-color:var(--accent);color:var(--accent)}
+.add-card .plus{font-size:2rem}
+
+/* DETAIL */
+.detail-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px}
+.detail-avatar{width:72px;height:72px;border-radius:50%;background:var(--surface2);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);flex-shrink:0;overflow:hidden}
+.detail-avatar img{width:100%;height:100%;object-fit:cover}
+.detail-info{flex:1;min-width:0}
+.detail-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;line-height:1;margin-bottom:4px;word-break:break-word}
+.detail-meta{color:var(--muted);font-size:.82rem;margin-bottom:8px}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap}
+.detail-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.info-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.info-block-label{font-size:.66rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px}
+.info-block-value{font-size:.95rem;font-weight:500}
+.notes-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:20px}
+.notes-block-label{font-size:.66rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.notes-block p{font-size:.86rem;color:#bbb;line-height:1.6}
+
+/* TABS */
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border)}
+.tab-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;padding:10px 8px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;flex:1;text-align:center}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* TRAININGS */
+.training-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.training-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none}
+.training-date{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--accent)}
+.training-summary{font-size:.76rem;color:var(--muted);margin-top:2px}
+.training-chevron{color:var(--muted);transition:transform .2s}
+.training-block.open .training-chevron{transform:rotate(180deg)}
+.training-body{display:none;padding:0 16px 16px}
+.training-block.open .training-body{display:block}
+.training-note{background:var(--surface2);border-radius:8px;padding:9px 12px;font-size:.82rem;color:#aaa;margin-bottom:10px;font-style:italic}
+.exercises-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.exercises-table th{text-align:left;font-size:.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:5px 6px;border-bottom:1px solid var(--border)}
+.exercises-table td{padding:7px 6px;border-bottom:1px solid #1e1e1e;font-family:'DM Mono',monospace;font-size:.78rem}
+.exercises-table tr:last-child td{border-bottom:none}
+.ex-name{font-family:'DM Sans',sans-serif!important;font-weight:500;color:var(--text)}
+.ex-weight{color:var(--accent);font-weight:500}
+.series-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.7rem;margin:1px;font-family:'DM Mono',monospace;color:var(--muted)}
+.series-badge span{color:var(--text)}
+
+/* WEIGHT */
+.weight-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.weight-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.weight-list{display:flex;flex-direction:column;gap:8px}
+.weight-row{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+.weight-row-date{font-size:.76rem;color:var(--muted)}
+.weight-row-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent)}
+.weight-row-delta{font-size:.74rem;margin-left:8px}
+.delta-up{color:#ff7a5c}.delta-down{color:#4ade80}
+
+/* INBODY */
+.inbody-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.inbody-card-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none}
+.inbody-card-date{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--accent)}
+.inbody-card-summary{font-size:.76rem;color:var(--muted);margin-top:2px}
+.inbody-chevron{color:var(--muted);transition:transform .2s}
+.inbody-card.open .inbody-chevron{transform:rotate(180deg)}
+.inbody-card-body{display:none;padding:0 16px 16px}
+.inbody-card.open .inbody-card-body{display:block}
+.inbody-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inbody-param{background:var(--surface2);border-radius:8px;padding:10px 12px}
+.inbody-param-label{font-size:.64rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px}
+.inbody-param-value{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);line-height:1}
+.inbody-param-unit{font-size:.72rem;color:var(--muted);margin-top:2px}
+.inbody-delta-up{color:#ff7a5c;font-size:.7rem}.inbody-delta-down{color:#4ade80;font-size:.7rem}
+
+/* HISTORY */
+.history-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.history-item:active{border-color:var(--accent)}
+.history-client{font-weight:600;font-size:.95rem}
+.history-type{font-size:.78rem;color:var(--accent);margin-top:2px}
+.history-date{font-size:.74rem;color:var(--muted);text-align:right}
+.history-exercises{font-size:.72rem;color:var(--muted);margin-top:2px}
+.period-filter{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.period-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:6px 12px;font-size:.76rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s}
+.period-btn.active{background:var(--accent);color:#0f0f0f;border-color:var(--accent)}
+.training-count-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.tcc-val{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--accent);line-height:1}
+.tcc-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* STATS */
+.stats-client-picker{margin-bottom:20px}
+.stats-client-picker label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+.stats-client-picker select,.stats-exercise-picker select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;outline:none;-webkit-appearance:none}
+.stats-exercise-picker{margin-bottom:20px}
+.stats-exercise-picker label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+.stats-chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.stats-chart-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--accent);margin-bottom:4px}
+.stats-chart-sub{font-size:.76rem;color:var(--muted);margin-bottom:14px}
+.stats-best{display:flex;gap:10px;margin-bottom:16px}
+.stats-best-block{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.stats-best-label{font-size:.66rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px}
+.stats-best-value{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent);line-height:1}
+.stats-best-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.stats-empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.stats-empty .big{font-size:2.5rem;margin-bottom:10px}.stats-empty p{font-size:.86rem}
+.stats-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.stats-tab-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;flex:1;text-align:center}
+.stats-tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.custom-period{display:none;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.custom-period.visible{display:flex}
+.custom-period input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;flex:1;min-width:110px;-webkit-appearance:none}
+.custom-period input:focus{border-color:var(--accent)}
+.custom-period span{font-size:.76rem;color:var(--muted)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px;padding-bottom:calc(24px + var(--safe-bottom));width:100%;max-width:600px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:16px;color:var(--accent)}
+.form-group{margin-bottom:13px}
+.form-group label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.form-group input,.form-group textarea,.form-group select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* EXERCISE ROWS - new series per set */
+.exercise-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.exercise-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px}
+.ex-row-header{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:flex-end;margin-bottom:10px}
+.ex-row-header input{background:var(--bg);border:1px solid #333;border-radius:8px;padding:9px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;outline:none;width:100%}
+.ex-row-header input:focus{border-color:var(--accent)}
+.ex-suggest{position:relative}
+.ex-suggest-list{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;z-index:200;max-height:180px;overflow-y:auto;display:none}
+.ex-suggest-item{padding:10px 12px;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border)}
+.ex-suggest-item:last-child{border-bottom:none}
+.ex-suggest-item:active{background:var(--surface2);color:var(--accent)}
+.series-rows{display:flex;flex-direction:column;gap:6px}
+.series-row{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:6px;align-items:center}
+.series-num{font-size:.7rem;color:var(--muted);text-align:center;min-width:22px;font-weight:600}
+.series-input{background:var(--bg);border:1px solid #333;border-radius:7px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;width:100%;text-align:center}
+.series-input:focus{border-color:var(--accent)}
+.series-input::placeholder{color:#444}
+.series-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;margin-bottom:3px}
+.add-series-btn{background:none;border:1px dashed var(--border);color:var(--muted);border-radius:7px;padding:7px;width:100%;cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif;margin-top:4px;text-align:center}
+.add-series-btn:active{border-color:var(--accent);color:var(--accent)}
+.remove-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:.85rem;flex-shrink:0}
+.remove-btn:active{color:var(--danger)}
+.add-exercise-btn{background:none;border:1px dashed var(--border);color:var(--muted);border-radius:10px;padding:11px;width:100%;cursor:pointer;font-size:.85rem;font-family:'DM Sans',sans-serif}
+.add-exercise-btn:active{border-color:var(--accent);color:var(--accent)}
+.data-section{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.data-section h4{font-size:.88rem;font-weight:600;margin-bottom:5px}
+.data-section p{font-size:.78rem;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state .big{font-size:2.5rem;margin-bottom:10px}.empty-state p{font-size:.86rem;margin-bottom:16px}
+select option{background:#222}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="goHome()">PT<span>Manager</span></div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-icon" onclick="showDataModal()">💾</button>
+    <button class="btn btn-primary" id="add-client-btn" style="display:none" onclick="openModal('client')">+ Klient</button>
+  </div>
+</header>
+<div id="app-scroll">
+  <main>
+    <!-- HOME -->
+    <div id="view-home">
+      <div class="home-greeting" id="home-greeting">Ahoj!</div>
+      <div class="home-sub" id="home-sub">Co dnes?</div>
+      <div class="home-tiles">
+        <div class="home-tile accent" onclick="showView('me')">
+          <div class="tile-icon">🏋️</div>
+          <div class="tile-label">Já</div>
+          <div class="tile-sub">Vlastní tréninky</div>
+        </div>
+        <div class="home-tile" onclick="showView('clients')">
+          <div class="tile-icon">👥</div>
+          <div class="tile-label">Klienti</div>
+          <div class="tile-sub" id="tile-clients-sub">0 klientů</div>
+        </div>
+      </div>
+      <div class="home-tile-wide" onclick="showView('history')">
+        <div class="htw-icon">📅</div>
+        <div class="htw-info">
+          <div class="htw-label">Historie tréninků</div>
+          <div class="htw-sub" id="tile-history-sub">Přehled všech tréninků</div>
+        </div>
+        <span style="color:var(--muted);font-size:1.2rem">›</span>
+      </div>
+      <div class="home-tile-wide" onclick="showView('stats')">
+        <div class="htw-icon">📊</div>
+        <div class="htw-info">
+          <div class="htw-label">Statistiky & Progress</div>
+          <div class="htw-sub">Grafy výkonu a InBody</div>
+        </div>
+        <span style="color:var(--muted);font-size:1.2rem">›</span>
+      </div>
+    </div>
+
+    <!-- ME -->
+    <div id="view-me" style="display:none">
+      <button class="back-btn" onclick="goHome()">← Zpět</button>
+      <div class="section-title">🏋️ Moje tréninky</div>
+      <div class="detail-actions">
+        <button class="btn btn-primary btn-sm" onclick="openModal('training','__me__')">+ Trénink</button>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('weight','__me__')">+ Váha</button>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('inbody','__me__')">+ InBody</button>
+        <button class="btn btn-ghost btn-sm" onclick="editMeProfile()">Profil</button>
+        <button class="btn btn-ghost btn-sm" onclick="openImportMeModal()" id="import-me-btn">📥 Přenést z klientů</button>
+      </div>
+      <div id="me-info-grid" class="info-grid"></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('trainings','me')">🏋️ Tréninky</button>
+        <button class="tab-btn" onclick="switchTab('weight','me')">⚖️ Váha</button>
+        <button class="tab-btn" onclick="switchTab('inbody','me')">📋 InBody</button>
+      </div>
+      <div class="tab-panel active" id="me-tab-trainings"><div id="me-trainings-list"></div></div>
+      <div class="tab-panel" id="me-tab-weight">
+        <div class="weight-header"><div class="section-title" style="margin:0;font-size:1.1rem">Průběh váhy</div><button class="btn btn-ghost btn-sm" onclick="openModal('weight','__me__')">+ Přidat</button></div>
+        <div id="me-weight-chart-wrap" style="display:none" class="weight-chart-wrap"><canvas id="meWeightChart" height="200"></canvas></div>
+        <div class="weight-list" id="me-weight-list"></div>
+      </div>
+      <div class="tab-panel" id="me-tab-inbody">
+        <div class="weight-header"><div class="section-title" style="margin:0;font-size:1.1rem">InBody měření</div><button class="btn btn-ghost btn-sm" onclick="openModal('inbody','__me__')">+ Přidat</button></div>
+        <div id="me-inbody-list"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="view-clients" style="display:none">
+      <button class="back-btn" onclick="goHome()">← Zpět</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="section-title" style="margin:0">Klienti <span id="client-count"></span></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('client')">+ Klient</button>
+      </div>
+      <div class="period-filter" id="clients-period-filter" style="margin-bottom:12px">
+        <button class="period-btn active" data-cp="all" onclick="setClientsPeriod('all')">Vše</button>
+        <button class="period-btn" data-cp="week" onclick="setClientsPeriod('week')">Týden</button>
+        <button class="period-btn" data-cp="month" onclick="setClientsPeriod('month')">Měsíc</button>
+        <button class="period-btn" data-cp="3m" onclick="setClientsPeriod('3m')">3 měs.</button>
+        <button class="period-btn" data-cp="6m" onclick="setClientsPeriod('6m')">6 měs.</button>
+        <button class="period-btn" data-cp="year" onclick="setClientsPeriod('year')">Rok</button>
+        <button class="period-btn" data-cp="custom" onclick="setClientsPeriod('custom')">Vlastní</button>
+      </div>
+      <div class="custom-period" id="clients-custom-period">
+        <span>Od</span><input type="date" id="clients-custom-from">
+        <span>Do</span><input type="date" id="clients-custom-to">
+        <button class="btn btn-primary btn-sm" onclick="applyClientsPeriod()">Použít</button>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="client-search" placeholder="Hledat klienta..." oninput="filterClients(this.value)" autocomplete="off">
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="stats-bar" id="stats-bar"></div>
+      <div class="clients-grid" id="clients-grid"></div>
+    </div>
+
+    <!-- CLIENT DETAIL -->
+    <div id="view-detail" style="display:none">
+      <button class="back-btn" onclick="goBack()">← Zpět</button>
+      <div class="detail-header">
+        <div class="detail-avatar" id="detail-avatar"></div>
+        <div class="detail-info">
+          <div class="detail-name" id="detail-name"></div>
+          <div class="detail-meta" id="detail-meta"></div>
+          <div class="detail-tags" id="detail-tags"></div>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-primary btn-sm" onclick="openModal('training',currentClientId)">+ Trénink</button>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('weight',currentClientId)">+ Váha</button>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('inbody',currentClientId)">+ InBody</button>
+        <button class="btn btn-ghost btn-sm" onclick="editCurrentClient()">Upravit</button>
+      </div>
+      <div class="info-grid" id="info-grid"></div>
+      <div id="notes-block"></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('trainings','client')">🏋️ Tréninky <span id="training-count"></span></button>
+        <button class="tab-btn" onclick="switchTab('weight','client')">⚖️ Váha</button>
+        <button class="tab-btn" onclick="switchTab('inbody','client')">📋 InBody</button>
+      </div>
+      <div class="tab-panel active" id="tab-trainings"><div id="trainings-list"></div></div>
+      <div class="tab-panel" id="tab-weight">
+        <div class="weight-header"><div class="section-title" style="margin:0;font-size:1.1rem">Průběh váhy</div><button class="btn btn-ghost btn-sm" onclick="openModal('weight',currentClientId)">+ Přidat</button></div>
+        <div id="weight-chart-wrap" style="display:none" class="weight-chart-wrap"><canvas id="weightChart" height="200"></canvas></div>
+        <div class="weight-list" id="weight-list"></div>
+      </div>
+      <div class="tab-panel" id="tab-inbody">
+        <div class="weight-header"><div class="section-title" style="margin:0;font-size:1.1rem">InBody měření</div><button class="btn btn-ghost btn-sm" onclick="openModal('inbody',currentClientId)">+ Přidat</button></div>
+        <div id="inbody-list"></div>
+      </div>
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid var(--border)">
+        <button class="btn btn-danger btn-sm" onclick="deleteCurrentClient()" style="width:100%;opacity:.6" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">🗑 Smazat klienta</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="view-history" style="display:none">
+      <button class="back-btn" onclick="goHome()">← Zpět</button>
+      <div class="section-title">📅 Historie tréninků</div>
+      <div class="period-filter" id="hist-period-filter">
+        <button class="period-btn active" data-p="week" onclick="setHistPeriod('week')">Týden</button>
+        <button class="period-btn" data-p="month" onclick="setHistPeriod('month')">Měsíc</button>
+        <button class="period-btn" data-p="3m" onclick="setHistPeriod('3m')">3 měs.</button>
+        <button class="period-btn" data-p="6m" onclick="setHistPeriod('6m')">6 měs.</button>
+        <button class="period-btn" data-p="year" onclick="setHistPeriod('year')">Rok</button>
+        <button class="period-btn" data-p="all" onclick="setHistPeriod('all')">Vše</button>
+        <button class="period-btn" data-p="custom" onclick="setHistPeriod('custom')">Vlastní</button>
+      </div>
+      <div class="custom-period" id="hist-custom-period">
+        <span>Od</span><input type="date" id="hist-custom-from">
+        <span>Do</span><input type="date" id="hist-custom-to">
+        <button class="btn btn-primary btn-sm" onclick="applyHistCustomPeriod()">Použít</button>
+      </div>
+      <div class="training-count-card" id="hist-count-card">
+        <div><div class="tcc-val" id="hist-count-val">0</div><div class="tcc-label" id="hist-count-label">tréninků</div></div>
+        <div style="font-size:2.5rem">🔥</div>
+      </div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="view-stats" style="display:none">
+      <button class="back-btn" onclick="goHome()">← Zpět</button>
+      <div class="section-title">📊 Statistiky</div>
+      <div class="stats-client-picker">
+        <label>Klient</label>
+        <select id="stats-client-select" onchange="onStatsClientChange()"><option value="">– vyber klienta –</option></select>
+      </div>
+      <div class="stats-tabs" id="stats-tabs" style="display:none">
+        <button class="stats-tab-btn active" onclick="switchStatsTab('performance')">🏋️ Výkon</button>
+        <button class="stats-tab-btn" onclick="switchStatsTab('inbody')">📋 InBody</button>
+      </div>
+      <div id="stats-content"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="goHome()"><span class="nav-icon">🏠</span>Domů</button>
+  <button class="nav-btn" id="nav-me" onclick="showView('me')"><span class="nav-icon">🏋️</span>Já</button>
+  <button class="nav-btn" id="nav-clients" onclick="showView('clients')"><span class="nav-icon">👥</span>Klienti</button>
+  <button class="nav-btn" id="nav-history" onclick="showView('history')"><span class="nav-icon">📅</span>Historie</button>
+  <button class="nav-btn" id="nav-stats" onclick="showView('stats')"><span class="nav-icon">📊</span>Statistiky</button>
+</nav>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ─── STATE ───
+let clients=[];
+let me={name:'',photoUrl:'',age:'',height:'',weight:'',goal:'',trainings:[],weights:[],inbody:[]};
+try{const d=JSON.parse(localStorage.getItem('pt_data')||'{}');clients=d.clients||[];me=Object.assign({name:'',photoUrl:'',age:'',height:'',weight:'',goal:'',trainings:[],weights:[],inbody:[]},d.me||{});}catch(e){clients=[];}
+
+let currentClientId=null,currentEditId=null,currentModalOwner=null;
+let weightChartInstance=null,meWeightChartInstance=null;
+let statsCharts=[];
+let navHistory=['home'];
+let currentStatsTab='performance',currentPeriod='all',customFrom='',customTo='',histPeriod='week';
+
+// PRESET EXERCISES per training type
+const PRESET_EXERCISES={
+  'Full Body':['Dřep','Mrtvý tah','Bench press','Shyby','Overhead press','Plank','Burpees','Kettlebell swing'],
+  'Push':['Bench press','Šikmý bench press','Shoulder press','Triceps pushdown','Chest fly','Dips','Lateral raise'],
+  'Pull':['Shyby','Přítahy na kladce','Seated row','Biceps curl','Face pull','Hammer curl','Deadlift'],
+  'Legs':['Dřep','Rumunský mrtvý tah','Leg press','Výpady','Leg curl','Leg extension','Calf raise','Bulharský dřep'],
+  'Horní část':['Bench press','Přítahy na kladce','Shoulder press','Biceps curl','Triceps pushdown','Lateral raise','Face pull'],
+  'Dolní část':['Dřep','Mrtvý tah','Leg press','Výpady','Leg curl','Calf raise','Hip thrust'],
+  'Kardio':['Běh','Skipping','Rotoped','Eliptický trenažér','Jumping jacks','Mountain climbers','Burpees'],
+};
+
+function save(){localStorage.setItem('pt_data',JSON.stringify({clients,me}));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function today(){return new Date().toISOString().slice(0,10);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(s){if(!s)return'–';return new Date(s).toLocaleDateString('cs-CZ',{day:'numeric',month:'long',year:'numeric'});}
+function fmtDateShort(s){if(!s)return'';return new Date(s).toLocaleDateString('cs-CZ',{day:'numeric',month:'short'});}
+function getLatestWeight(owner){
+  // Get most recent weight from both weights array and inbody bodyweight
+  const weights=(owner.weights||[]).filter(w=>w.weight).map(w=>({date:w.date,val:parseFloat(w.weight)}));
+  const ibWeights=(owner.inbody||[]).filter(e=>e.bodyweight).map(e=>({date:e.date,val:parseFloat(e.bodyweight)}));
+  const all=[...weights,...ibWeights].sort((a,b)=>b.date.localeCompare(a.date));
+  return all.length?all[0].val:null;
+}
+function getOwner(ownerId){return ownerId==='__me__'?me:clients.find(x=>x.id===ownerId);}
+
+function getAllTrainings(){
+  // Only client trainings in history (own trainings are in Já section)
+  const all=[];
+  clients.forEach(c=>(c.trainings||[]).forEach(t=>all.push({...t,_owner:c.id,_ownerName:c.name})));
+  return all.sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+// ─── NAVIGATION ───
+const VIEWS=['home','me','clients','detail','history','stats'];
+function hideAll(){VIEWS.forEach(v=>{const el=document.getElementById('view-'+v);if(el)el.style.display='none';});}
+function setNav(active){['home','me','clients','history','stats'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.toggle('active',n===active);});}
+
+function showView(view,fromBack){
+  hideAll();
+  document.getElementById('view-'+view).style.display='block';
+  document.getElementById('app-scroll').scrollTop=0;
+  if(!fromBack)navHistory.push(view);
+  setNav(view);
+  document.getElementById('add-client-btn').style.display='none';
+  if(view==='home')renderHome();
+  else if(view==='clients')renderClientsView();
+  else if(view==='me')renderMeView();
+  else if(view==='history'){renderHistory();setNav('history');}
+  else if(view==='stats'){renderStatsPage();setNav('stats');}
+}
+
+function goHome(){navHistory=['home'];hideAll();document.getElementById('view-home').style.display='block';setNav('home');renderHome();}
+
+function goBack(){
+  navHistory.pop();
+  const prev=navHistory[navHistory.length-1]||'home';
+  if(prev==='home')goHome();
+  else if(prev==='clients'){navHistory.pop();showView('clients');}
+  else if(prev==='me'){navHistory.pop();showView('me');}
+  else showView(prev,true);
+}
+
+function showDetail(id,fromBack){
+  if(!fromBack)navHistory.push('detail');
+  currentClientId=id;
+  hideAll();
+  document.getElementById('view-detail').style.display='block';
+  document.getElementById('app-scroll').scrollTop=0;
+  setNav('clients');
+  renderDetail(id);
+}
+
+// ─── HOME ───
+function renderHome(){
+  const h=new Date().getHours();
+  const greet=h<12?'Dobré ráno!':h<17?'Dobré odpoledne!':'Dobrý večer!';
+  document.getElementById('home-greeting').textContent=me.name?greet+' '+me.name:greet;
+  const totalT=getAllTrainings().length;
+  document.getElementById('home-sub').textContent=`Celkem ${totalT} tréninků`;
+  document.getElementById('tile-clients-sub').textContent=clients.length+' klientů';
+  const all=getAllTrainings();
+  document.getElementById('tile-history-sub').textContent=all.length?`Naposledy: ${fmtDate(all[0].date)}`:'Zatím žádné tréninky';
+}
+
+// ─── ME VIEW ───
+function renderMeView(){
+  const latestW=getLatestWeight(me);
+  const wDisp=latestW?latestW+' kg':'';
+  const meT=me.trainings||[];
+  const infoBlocks=[
+    me.age?`<div class="info-block"><div class="info-block-label">Věk</div><div class="info-block-value">${esc(me.age)} let</div></div>`:'',
+    me.height?`<div class="info-block"><div class="info-block-label">Výška</div><div class="info-block-value">${esc(me.height)} cm</div></div>`:'',
+    wDisp?`<div class="info-block"><div class="info-block-label">Váha</div><div class="info-block-value">${wDisp}</div></div>`:'',
+    me.goal?`<div class="info-block"><div class="info-block-label">Cíl</div><div class="info-block-value">${esc(me.goal)}</div></div>`:'',
+  ].filter(Boolean).join('');
+  document.getElementById('me-info-grid').innerHTML=`
+    ${infoBlocks?`<div class="info-grid" style="margin-bottom:10px">${infoBlocks}</div>`:''}
+    <div class="stat" style="cursor:pointer;width:100%" onclick="openTrainingCountModal('__me__')">
+      <div class="stat-value">${meT.length}</div>
+      <div class="stat-label">Tréninků celkem 🔎</div>
+    </div>`;
+  switchTab('trainings','me');
+}
+
+function switchTab(tab,ctx){
+  if(ctx==='me'){
+    ['trainings','weight','inbody'].forEach((t,i)=>{
+      document.querySelectorAll('#view-me .tab-btn')[i]?.classList.toggle('active',t===tab);
+      const el=document.getElementById('me-tab-'+t);if(el)el.classList.toggle('active',t===tab);
+    });
+    if(tab==='trainings')renderTrainings(me,'me-trainings-list','__me__');
+    if(tab==='weight')renderWeightTab(me,'me-weight-chart-wrap','meWeightChart','me-weight-list','__me__');
+    if(tab==='inbody')renderInBodyTab(me,'me-inbody-list','__me__');
+  } else {
+    ['trainings','weight','inbody'].forEach((t,i)=>{
+      document.querySelectorAll('#view-detail .tab-btn')[i]?.classList.toggle('active',t===tab);
+      const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('active',t===tab);
+    });
+    const c=clients.find(x=>x.id===currentClientId);
+    if(!c)return;
+    if(tab==='trainings')renderTrainings(c,'trainings-list',currentClientId);
+    if(tab==='weight')renderWeightTab(c,'weight-chart-wrap','weightChart','weight-list',currentClientId);
+    if(tab==='inbody')renderInBodyTab(c,'inbody-list',currentClientId);
+  }
+}
+
+// ─── CLIENTS VIEW ───
+let clientsPeriod='all',clientsCustomFrom='',clientsCustomTo='';
+
+function setClientsPeriod(p){
+  clientsPeriod=p;
+  document.querySelectorAll('#clients-period-filter .period-btn').forEach(b=>b.classList.toggle('active',b.dataset.cp===p));
+  const cp=document.getElementById('clients-custom-period');
+  if(cp)cp.classList.toggle('visible',p==='custom');
+  if(p!=='custom')renderClientsView(true);
+}
+function applyClientsPeriod(){
+  clientsCustomFrom=document.getElementById('clients-custom-from').value;
+  clientsCustomTo=document.getElementById('clients-custom-to').value;
+  renderClientsView(true);
+}
+function filterClientsPeriod(trainings){
+  if(clientsPeriod==='all')return trainings;
+  if(clientsPeriod==='custom'){
+    return trainings.filter(t=>(!clientsCustomFrom||t.date>=clientsCustomFrom)&&(!clientsCustomTo||t.date<=clientsCustomTo));
+  }
+  const days={'week':7,'month':30,'3m':90,'6m':180,'year':365}[clientsPeriod]||30;
+  const cutoff=new Date(Date.now()-days*86400000).toISOString().slice(0,10);
+  return trainings.filter(t=>t.date>=cutoff);
+}
+
+function renderClientsView(keepPeriod){
+  document.getElementById('client-count').textContent=clients.length?`(${clients.length})`:'';
+  // Restore period filter active state
+  document.querySelectorAll('#clients-period-filter .period-btn').forEach(b=>b.classList.toggle('active',b.dataset.cp===clientsPeriod));
+  const cp2=document.getElementById('clients-custom-period');
+  if(cp2)cp2.classList.toggle('visible',clientsPeriod==='custom');
+  const totalT=clients.reduce((s,c)=>s+filterClientsPeriod(c.trainings||[]).length,0);
+  const activeCount=clients.filter(c=>filterClientsPeriod(c.trainings||[]).length>0).length;
+  const periodSuffix=clientsPeriod==='all'?'':clientsPeriod==='custom'?' (vlastní)':{'week':' / týden','month':' / měsíc','3m':' / 3M','6m':' / 6M','year':' / rok'}[clientsPeriod]||'';
+  document.getElementById('stats-bar').innerHTML=`
+    <div class="stat"><div class="stat-value">${clients.length}</div><div class="stat-label">Klientů</div></div>
+    <div class="stat"><div class="stat-value">${totalT}</div><div class="stat-label">Tréninků${esc(periodSuffix)}</div></div>
+    <div class="stat"><div class="stat-value">${activeCount}</div><div class="stat-label">Aktivních${esc(periodSuffix)}</div></div>`;
+  renderClientCards();
+}
+
+// ─── CLIENT DETAIL ───
+function renderDetail(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  const initials=c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('detail-avatar').innerHTML=c.photoUrl?`<img src="${esc(c.photoUrl)}" alt="">`:initials;
+  document.getElementById('detail-name').textContent=c.name;
+  const latestW=getLatestWeight(c);
+  const wDisp=latestW?latestW+' kg':'';
+  document.getElementById('detail-meta').textContent=[c.age?c.age+' let':'',wDisp?'Váha: '+wDisp:''].filter(Boolean).join(' · ');
+  document.getElementById('detail-tags').innerHTML=[c.goal?`<span class="tag tag-goal">${esc(c.goal)}</span>`:'',c.limitations?`<span class="tag tag-warn">⚠ Omezení</span>`:''].join('');
+  document.getElementById('info-grid').innerHTML=[
+    c.age?`<div class="info-block"><div class="info-block-label">Věk</div><div class="info-block-value">${esc(c.age)} let</div></div>`:'',
+    c.height?`<div class="info-block"><div class="info-block-label">Výška</div><div class="info-block-value">${esc(c.height)} cm</div></div>`:'',
+    wDisp?`<div class="info-block"><div class="info-block-label">Váha</div><div class="info-block-value">${wDisp}</div></div>`:'',
+    c.goal?`<div class="info-block"><div class="info-block-label">Cíl</div><div class="info-block-value">${esc(c.goal)}</div></div>`:'',
+    `<div class="info-block" style="cursor:pointer" onclick="openTrainingCountModal('${c.id}')" title="Klikni pro přehled po období"><div class="info-block-label">Tréninků 🔎</div><div class="info-block-value">${c.trainings?.length||0}</div></div>`,
+  ].filter(Boolean).join('');
+  document.getElementById('notes-block').innerHTML=c.limitations?`<div class="notes-block"><div class="notes-block-label">⚠ Zdravotní omezení</div><p>${esc(c.limitations)}</p></div>`:'';
+  switchTab('trainings','client');
+}
+
+// ─── TRAININGS RENDER ───
+function renderTrainings(owner,listId,ownerId){
+  const list=document.getElementById(listId);
+  if(listId==='trainings-list')document.getElementById('training-count').textContent=owner.trainings?.length?`(${owner.trainings.length})`:'';
+  if(!owner.trainings?.length){list.innerHTML=`<div class="empty-state"><div class="big">🏋️</div><p>Zatím žádné tréninky.</p><button class="btn btn-primary" onclick="openModal('training','${ownerId}')">+ Nový trénink</button></div>`;return;}
+  list.innerHTML=[...owner.trainings].reverse().map((t,ri)=>{
+    const i=owner.trainings.length-1-ri;
+    const exRows=t.exercises.map(ex=>{
+      const seriesHtml=(ex.series||[]).map((s,si)=>`<span class="series-badge">${si+1}. <span>${s.reps||'?'} × ${s.weight||'?'}kg</span></span>`).join('');
+      return `<tr><td class="ex-name">${esc(ex.name)}</td><td style="white-space:normal">${seriesHtml||`<span class="series-badge"><span>${ex.reps||'?'} × ${ex.weight||'?'}kg</span></span>`}</td></tr>`;
+    }).join('');
+    return `<div class="training-block" id="tb-${ownerId}-${i}">
+      <div class="training-top" onclick="toggleBlock('tb-${ownerId}-${i}')">
+        <div>
+          <div class="training-date">${t.name?`<span style="color:var(--text);font-size:.9rem;margin-right:8px">${esc(t.name)}</span>`:''}${fmtDate(t.date)}</div>
+          <div class="training-summary">${t.exercises.length} cviků · ${t.exercises.map(e=>e.name).join(', ').slice(0,50)}${t.exercises.map(e=>e.name).join(', ').length>50?'...':''}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();repeatTraining(${i},'${ownerId}')" title="Zopakovat trénink">🔁</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editTraining(${i},'${ownerId}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteTraining(${i},'${ownerId}')">✕</button>
+          <span class="training-chevron">▾</span>
+        </div>
+      </div>
+      <div class="training-body">
+        ${t.note?`<div class="training-note">💬 ${esc(t.note)}</div>`:''}
+        <table class="exercises-table">
+          <thead><tr><th>Cvik</th><th>Série (opak × kg)</th></tr></thead>
+          <tbody>${exRows}</tbody>
+        </table>
+        <div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="openStatsFrom('performance','${ownerId}')">📊 Statistiky výkonu</button></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleBlock(id){document.getElementById(id)?.classList.toggle('open');}
+
+function openStatsFrom(tab,ownerId){
+  currentStatsTab=tab;
+  showView('stats');
+  setTimeout(()=>{
+    const sel=document.getElementById('stats-client-select');
+    sel.value=ownerId;
+    onStatsClientChange();
+  },150);
+}
+
+// ─── WEIGHT ───
+function renderWeightTab(owner,wrapId,canvasId,listId,ownerId){
+  const weights=owner.weights||[];
+  const wrapEl=document.getElementById(wrapId);
+  const listEl=document.getElementById(listId);
+  if(!weights.length){wrapEl.style.display='none';listEl.innerHTML=`<div style="text-align:center;padding:30px;color:var(--muted)">Zatím žádné záznamy váhy.</div>`;return;}
+  const sorted=[...weights].sort((a,b)=>a.date.localeCompare(b.date));
+  wrapEl.style.display='block';
+  const ctx=document.getElementById(canvasId)?.getContext('2d');
+  if(!ctx)return;
+  if(canvasId==='weightChart'&&weightChartInstance){weightChartInstance.destroy();}
+  if(canvasId==='meWeightChart'&&meWeightChartInstance){meWeightChartInstance.destroy();}
+  const ch=new Chart(ctx,{type:'line',data:{labels:sorted.map(w=>fmtDateShort(w.date)),datasets:[{data:sorted.map(w=>parseFloat(w.weight)),borderColor:'#c8f135',backgroundColor:'rgba(200,241,53,.08)',pointBackgroundColor:'#c8f135',pointBorderColor:'#0f0f0f',pointBorderWidth:2,pointRadius:5,tension:.35,fill:true}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#222',titleColor:'#c8f135',bodyColor:'#f0f0f0',borderColor:'#2e2e2e',borderWidth:1,callbacks:{label:ctx=>` ${ctx.parsed.y} kg`}}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#888',font:{size:10},callback:v=>v+' kg'},grid:{color:'#1e1e1e'}}}}});
+  if(canvasId==='weightChart')weightChartInstance=ch;
+  else meWeightChartInstance=ch;
+  listEl.innerHTML=[...sorted].reverse().map((w,ri)=>{
+    const prev=sorted[sorted.length-1-ri-1];
+    let delta='';
+    if(prev){const diff=(parseFloat(w.weight)-parseFloat(prev.weight)).toFixed(1);delta=diff>0?`<span class="weight-row-delta delta-up">▲ +${diff}</span>`:diff<0?`<span class="weight-row-delta delta-down">▼ ${diff}</span>`:`<span class="weight-row-delta" style="color:var(--muted)">= stejná</span>`;}
+    return `<div class="weight-row">
+      <div><div class="weight-row-date">${fmtDate(w.date)}${w.note?' · '+esc(w.note):''}</div><div style="display:flex;align-items:center"><div class="weight-row-val">${esc(w.weight)} kg</div>${delta}</div></div>
+      <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="editWeight('${w.id}','${ownerId}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="deleteWeight('${w.id}','${ownerId}')">✕</button></div>
+    </div>`;
+  }).join('');
+}
+function deleteWeight(wid,ownerId){if(!confirm('Smazat?'))return;const o=getOwner(ownerId);o.weights=(o.weights||[]).filter(w=>w.id!==wid);save();if(ownerId==='__me__')switchTab('weight','me');else switchTab('weight','client');}
+
+// ─── INBODY ───
+function renderInBodyTab(owner,listId,ownerId){
+  const list=document.getElementById(listId);
+  const entries=owner.inbody||[];
+  if(!entries.length){list.innerHTML=`<div class="empty-state"><div class="big">📋</div><p>Zatím žádná InBody měření.</p><button class="btn btn-primary" onclick="openModal('inbody','${ownerId}')">+ Přidat měření</button></div>`;return;}
+  const sorted=[...entries].reverse();
+  list.innerHTML=sorted.map((e,ri)=>{
+    const prev=entries[entries.length-1-ri-1];
+    const params=[
+      {label:'Těl. váha',val:e.bodyweight,unit:'kg',key:'bodyweight',lowerBetter:false},
+      {label:'Tuk %',val:e.fatPct,unit:'%',key:'fatPct',lowerBetter:true},
+      {label:'Tuk kg',val:e.fatKg,unit:'kg',key:'fatKg',lowerBetter:true},
+      {label:'Svaly',val:e.muscle,unit:'kg',key:'muscle',lowerBetter:false},
+      {label:'Voda',val:e.water,unit:'kg',key:'water',lowerBetter:false},
+      {label:'BMI',val:e.bmi,unit:'',key:'bmi',lowerBetter:true},
+      {label:'BMR',val:e.bmr,unit:'kcal',key:'bmr',lowerBetter:false},
+    ].filter(p=>p.val!=='');
+    const pb=params.map(p=>{
+      let delta='';
+      if(prev&&prev[p.key]!==''){const diff=(parseFloat(e[p.key])-parseFloat(prev[p.key])).toFixed(1);const good=p.lowerBetter?diff<0:diff>0;const sign=diff>0?'+':'';delta=diff!=0?`<div class="${good?'inbody-delta-down':'inbody-delta-up'}">${sign}${diff}</div>`:'';}
+      const rawVal=parseFloat(e[p.key]);const dispVal=isNaN(rawVal)?esc(e[p.key]):(Number.isInteger(rawVal)?rawVal:parseFloat(rawVal.toFixed(2)));
+      return `<div class="inbody-param"><div class="inbody-param-label">${p.label}</div><div class="inbody-param-value">${dispVal}</div><div class="inbody-param-unit">${p.unit} ${delta}</div></div>`;
+    }).join('');
+    const summary=[e.bodyweight?'Váha: '+e.bodyweight+' kg':'',e.fatPct?'Tuk: '+e.fatPct+'%':'',e.muscle?'Svaly: '+e.muscle+'kg':''].filter(Boolean).join(' · ');
+    return `<div class="inbody-card" id="ib-${e.id}">
+      <div class="inbody-card-top" onclick="this.parentElement.classList.toggle('open')">
+        <div><div class="inbody-card-date">${fmtDate(e.date)}</div><div class="inbody-card-summary">${summary}${e.note?' · '+esc(e.note):''}</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editInBody('${e.id}','${ownerId}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteInBody('${e.id}','${ownerId}')">✕</button>
+          <span class="inbody-chevron">▾</span>
+        </div>
+      </div>
+      <div class="inbody-card-body">
+        <div class="inbody-grid">${pb}</div>
+        <div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="openStatsFrom('inbody','${ownerId}')">📊 Statistiky InBody</button></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deleteInBody(ibId,ownerId){if(!confirm('Smazat?'))return;const o=getOwner(ownerId);o.inbody=(o.inbody||[]).filter(e=>e.id!==ibId);save();if(ownerId==='__me__')switchTab('inbody','me');else switchTab('inbody','client');}
+
+// ─── HISTORY ───
+let histCustomFrom='',histCustomTo='';
+
+function setHistPeriod(p){
+  histPeriod=p;
+  document.querySelectorAll('#hist-period-filter .period-btn').forEach(b=>b.classList.toggle('active',b.dataset.p===p));
+  const cp=document.getElementById('hist-custom-period');
+  if(cp)cp.classList.toggle('visible',p==='custom');
+  if(p!=='custom')renderHistory();
+}
+function applyHistCustomPeriod(){
+  histCustomFrom=document.getElementById('hist-custom-from').value;
+  histCustomTo=document.getElementById('hist-custom-to').value;
+  renderHistory();
+}
+function filterHistPeriod(items){
+  if(histPeriod==='all')return items;
+  if(histPeriod==='custom'){
+    return items.filter(i=>(!histCustomFrom||i.date>=histCustomFrom)&&(!histCustomTo||i.date<=histCustomTo));
+  }
+  const now=new Date();
+  const days={'week':7,'month':30,'3m':90,'6m':180,'year':365}[histPeriod]||30;
+  const cutoff=new Date(now-days*86400000).toISOString().slice(0,10);
+  return items.filter(i=>i.date>=cutoff);
+}
+function renderHistory(){
+  const all=getAllTrainings().sort((a,b)=>b.date.localeCompare(a.date));
+  const filtered=filterHistPeriod(all);
+  document.getElementById('hist-count-val').textContent=filtered.length;
+  const periodLabel={'week':'tento týden','month':'tento měsíc','3m':'za 3 měsíce','6m':'za 6 měsíců','year':'za rok','all':'celkem','custom':'ve vybraném období'}[histPeriod]||'';
+  document.getElementById('hist-count-label').textContent='tréninků '+periodLabel;
+  const listEl=document.getElementById('history-list');
+  if(!filtered.length){listEl.innerHTML=`<div class="empty-state"><div class="big">📅</div><p>Žádné tréninky v tomto období.</p></div>`;return;}
+  listEl.innerHTML=filtered.map(t=>`
+    <div class="history-item" onclick="goToOwner('${t._owner}')">
+      <div>
+        <div class="history-client">${esc(t._ownerName)}</div>
+        <div class="history-type">${esc(t.name||'Trénink')}</div>
+        <div class="history-exercises">${t.exercises.map(e=>e.name).join(', ').slice(0,60)}${t.exercises.map(e=>e.name).join(', ').length>60?'...':''}</div>
+      </div>
+      <div class="history-date">${fmtDate(t.date)}</div>
+    </div>`).join('');
+}
+
+function openTrainingCountModal(ownerId){
+  const owner=getOwner(ownerId);
+  if(!owner)return;
+  const name=ownerId==='__me__'?(me.name||'Já'):owner.name;
+  const trainings=owner.trainings||[];
+  const overlay=document.getElementById('modal-overlay');
+  const mc=document.getElementById('modal-content');
+  overlay.classList.add('open');
+
+  function countFor(p,from,to){
+    if(p==='all')return trainings.length;
+    if(p==='custom'){return trainings.filter(t=>(!from||t.date>=from)&&(!to||t.date<=to)).length;}
+    const days={'week':7,'month':30,'3m':90,'6m':180,'year':365}[p]||30;
+    const cutoff=new Date(Date.now()-days*86400000).toISOString().slice(0,10);
+    return trainings.filter(t=>t.date>=cutoff).length;
+  }
+
+  function rebuildModal(selPeriod,from,to){
+    const periods=[
+      {p:'week',label:'Tento týden'},
+      {p:'month',label:'Tento měsíc'},
+      {p:'3m',label:'3 měsíce'},
+      {p:'6m',label:'6 měsíců'},
+      {p:'year',label:'Rok'},
+      {p:'all',label:'Celkem'},
+    ];
+    const rows=periods.map(x=>{
+      const cnt=countFor(x.p,'','');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:.9rem">${x.label}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent)">${cnt}</span>
+      </div>`;
+    }).join('');
+    const customCount=countFor('custom',from,to);
+    mc.innerHTML=`<div class="modal-handle"></div>
+      <h3>📊 Tréninky – ${esc(name)}</h3>
+      ${rows}
+      <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Vlastní období</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <span style="font-size:.8rem;color:var(--muted)">Od</span>
+          <input type="date" id="tc-from" value="${from}" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;flex:1;min-width:120px;outline:none;-webkit-appearance:none">
+          <span style="font-size:.8rem;color:var(--muted)">Do</span>
+          <input type="date" id="tc-to" value="${to}" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;flex:1;min-width:120px;outline:none;-webkit-appearance:none">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <button class="btn btn-primary btn-sm" onclick="refreshTCModal('${ownerId}')">Zobrazit</button>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent)">${from||to?customCount:'–'}</span>
+        </div>
+      </div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zavřít</button></div>`;
+  }
+
+  window._tcOwnerId=ownerId;
+  rebuildModal('','' ,'');
+  window._rebuildTCModal=rebuildModal;
+}
+
+function refreshTCModal(ownerId){
+  const from=document.getElementById('tc-from').value;
+  const to=document.getElementById('tc-to').value;
+  window._rebuildTCModal('custom',from,to);
+}
+function goToOwner(ownerId){
+  if(ownerId==='__me__')showView('me');
+  else showDetail(ownerId);
+}
+
+// ─── MODAL ───
+const preselectedNames=['Full Body','Push','Pull','Legs','Horní část','Dolní část','Kardio'];
+
+function openModal(type,ownerId){
+  currentModalOwner=ownerId||null;
+  const overlay=document.getElementById('modal-overlay');
+  const content=document.getElementById('modal-content');
+  overlay.classList.add('open');
+  let html='<div class="modal-handle"></div>';
+
+  if(type==='client'){
+    html+=`<h3>Nový klient</h3>
+      <div class="form-group"><label>Jméno *</label><input id="f-name" type="text" placeholder="Jan Novák" autocomplete="name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Věk</label><input id="f-age" type="number" placeholder="25" inputmode="numeric"></div>
+        <div class="form-group"><label>Vstupní váha (kg)</label><input id="f-weight" type="number" placeholder="80" step="0.1" inputmode="decimal"></div>
+      </div>
+      <div class="form-group"><label>Cíl</label><select id="f-goal"><option value="">– vybrat –</option>${['Hubnutí','Nabírání svalů','Zlepšení kondice','Rehabilitace','Silový výkon','Vytrvalost'].map(g=>`<option>${g}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Výška (cm)</label><input id="f-height" type="number" placeholder="175" inputmode="numeric"></div>
+      <div class="form-group"><label>Zdravotní omezení</label><textarea id="f-lim" placeholder="Např. bolesti zad..."></textarea></div>
+      <div class="form-group"><label>URL fotky</label><input id="f-photo" type="url" placeholder="https://..."></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zrušit</button><button class="btn btn-primary" onclick="saveClient()">Uložit</button></div>`;
+
+  } else if(type==='edit-client'){
+    const c=clients.find(x=>x.id===currentClientId);
+    html+=`<h3>Upravit klienta</h3>
+      <div class="form-group"><label>Jméno *</label><input id="f-name" type="text" value="${esc(c.name)}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Věk</label><input id="f-age" type="number" value="${esc(c.age||'')}" inputmode="numeric"></div>
+        <div class="form-group"><label>Váha (kg)</label><input id="f-weight" type="number" value="${esc(c.weight||'')}" step="0.1" inputmode="decimal"></div>
+      </div>
+      <div class="form-group"><label>Cíl</label><select id="f-goal"><option value="">– vybrat –</option>${['Hubnutí','Nabírání svalů','Zlepšení kondice','Rehabilitace','Silový výkon','Vytrvalost'].map(g=>`<option ${c.goal===g?'selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Výška (cm)</label><input id="f-height" type="number" value="${esc(c.height||'')}" placeholder="175" inputmode="numeric"></div>
+      <div class="form-group"><label>Zdravotní omezení</label><textarea id="f-lim">${esc(c.limitations||'')}</textarea></div>
+      <div class="form-group"><label>URL fotky</label><input id="f-photo" type="url" value="${esc(c.photoUrl||'')}"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zrušit</button><button class="btn btn-primary" onclick="updateClient()">Uložit</button></div>`;
+
+  } else if(type==='me-profile'){
+    html+=`<h3>Můj profil</h3>
+      <div class="form-group"><label>Jméno</label><input id="mp-name" type="text" value="${esc(me.name||'')}" placeholder="Tvoje jméno"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Věk</label><input id="mp-age" type="number" value="${esc(me.age||'')}" inputmode="numeric"></div>
+        <div class="form-group"><label>Váha (kg)</label><input id="mp-weight" type="number" value="${esc(me.weight||'')}" step="0.1" inputmode="decimal"></div>
+      </div>
+      <div class="form-group"><label>Výška (cm)</label><input id="mp-height" type="number" value="${esc(me.height||'')}" placeholder="180" inputmode="numeric"></div>
+      <div class="form-group"><label>Cíl</label><select id="mp-goal"><option value="">– vybrat –</option>${['Hubnutí','Nabírání svalů','Zlepšení kondice','Silový výkon','Vytrvalost'].map(g=>`<option ${me.goal===g?'selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zrušit</button><button class="btn btn-primary" onclick="saveMeProfile()">Uložit</button></div>`;
+
+  } else if(type==='training'||type==='edit-training'){
+    const isEdit=type==='edit-training';
+    const owner=getOwner(ownerId||currentModalOwner);
+    const t=isEdit?owner?.trainings.find(x=>x.id===currentEditId):null;
+    const isCustom=t?.name&&!preselectedNames.includes(t.name);
+    html+=`<h3>${isEdit?'Upravit trénink':'Nový trénink'}</h3>
+      <div class="form-group"><label>Typ tréninku</label>
+        <select id="t-type-sel" onchange="onTrainingTypeChange()">
+          <option value="">– vyber typ –</option>
+          ${preselectedNames.map(n=>`<option ${t?.name===n?'selected':''}>${n}</option>`).join('')}
+          <option ${isCustom?'selected':''}>Vlastní</option>
+        </select>
+        <input id="t-name-custom" type="text" value="${isCustom?esc(t.name):''}" placeholder="Vlastní název..." style="display:${isCustom?'block':'none'};margin-top:8px">
+      </div>
+      <div class="form-group"><label>Datum</label><input id="t-date" type="date" value="${t?.date||today()}"></div>
+      ${!isEdit?`<div class="templates-section" id="templates-section"><div class="templates-section-title">📋 Ze šablony</div><div id="templates-chips"></div></div>`:''}
+      <div class="form-group"><label>Poznámka</label><textarea id="t-note" placeholder="Jak šel trénink...">${esc(t?.note||'')}</textarea></div>
+      <div class="form-group"><label>Cviky</label><div class="exercise-rows" id="exercise-rows"></div><button class="add-exercise-btn" onclick="addExerciseRow()">+ Přidat cvik</button></div>
+      <div class="modal-actions" style="flex-wrap:wrap;gap:8px">
+        <button class="btn btn-ghost" onclick="closeModal()">Zrušit</button>
+        ${!isEdit?`<button class="btn btn-ghost btn-sm" onclick="saveAsTemplate()" style="margin-right:auto">💾 Uložit jako šablonu</button>`:''}
+        <button class="btn btn-primary" onclick="${isEdit?'updateTraining':'saveTraining'}()">Uložit</button>
+      </div>`;
+
+  } else if(type==='weight'||type==='edit-weight'){
+    const isEdit=type==='edit-weight';
+    const o=getOwner(ownerId||currentModalOwner);
+    const w=isEdit?o?.weights.find(x=>x.id===currentEditId):null;
+    html+=`<h3>${isEdit?'Upravit váhu':'Záznam váhy'}</h3>
+      <div class="form-group"><label>Datum</label><input id="w-date" type="date" value="${w?.date||today()}"></div>
+      <div class="form-group"><label>Váha (kg) *</label><input id="w-weight" type="number" value="${esc(w?.weight||'')}" placeholder="78.5" step="0.1" inputmode="decimal"></div>
+      <div class="form-group"><label>Poznámka</label><input id="w-note" type="text" value="${esc(w?.note||'')}" placeholder="Ráno nalačno..."></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zrušit</button><button class="btn btn-primary" onclick="${isEdit?'updateWeight':'saveWeight'}()">Uložit</button></div>`;
+
+  } else if(type==='inbody'||type==='edit-inbody'){
+    const isEdit=type==='edit-inbody';
+    const o=getOwner(ownerId||currentModalOwner);
+    const e=isEdit?o?.inbody.find(x=>x.id===currentEditId):null;
+    html+=`<h3>${isEdit?'Upravit InBody':'📋 InBody měření'}</h3>
+      <div class="form-group"><label>Datum</label><input id="ib-date" type="date" value="${e?.date||today()}"></div>
+      <div class="form-row"><div class="form-group"><label>Tělesná váha (kg)</label><input id="ib-bw" type="number" value="${esc(e?.bodyweight||'')}" placeholder="78.5" step="0.1" inputmode="decimal"></div><div class="form-group"><label>BMI</label><input id="ib-bmi" type="number" value="${esc(e?.bmi||'')}" placeholder="22.4" step="0.1" inputmode="decimal"></div></div>
+      <div class="form-row"><div class="form-group"><label>Tělesný tuk (%)</label><input id="ib-fp" type="number" value="${esc(e?.fatPct||'')}" placeholder="18.5" step="0.1" inputmode="decimal"></div><div class="form-group"><label>Tělesný tuk (kg)</label><input id="ib-fk" type="number" value="${esc(e?.fatKg||'')}" placeholder="14.2" step="0.1" inputmode="decimal"></div></div>
+      <div class="form-row"><div class="form-group"><label>Svalová hmota (kg)</label><input id="ib-mu" type="number" value="${esc(e?.muscle||'')}" placeholder="35.0" step="0.1" inputmode="decimal"></div><div class="form-group"><label>Voda v těle (kg)</label><input id="ib-wa" type="number" value="${esc(e?.water||'')}" placeholder="42.0" step="0.1" inputmode="decimal"></div></div>
+      <div class="form-group"><label>BMR (kcal)</label><input id="ib-bmr" type="number" value="${esc(e?.bmr||'')}" placeholder="1850" inputmode="numeric"></div>
+      <div class="form-group"><label>Poznámka</label><input id="ib-note" type="text" value="${esc(e?.note||'')}" placeholder="Volitelná..."></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zrušit</button><button class="btn btn-primary" onclick="${isEdit?'updateInBody':'saveInBody'}()">Uložit</button></div>`;
+  }
+
+  content.innerHTML=html;
+
+  if(type==='training'){
+    addExerciseRow();addExerciseRow();
+    setTimeout(()=>renderTemplateChips(),0);
+  }
+  if(type==='edit-training'){
+    const owner=getOwner(ownerId||currentModalOwner);
+    const t=owner?.trainings.find(x=>x.id===currentEditId);
+    if(t)t.exercises.forEach(ex=>addExerciseRow(ex));
+  }
+}
+
+function onTrainingTypeChange(){
+  const sel=document.getElementById('t-type-sel').value;
+  const custom=document.getElementById('t-name-custom');
+  custom.style.display=sel==='Vlastní'?'block':'none';
+  if(sel==='Vlastní'){custom.focus();return;}
+  // Suggest exercises for this type
+  const rows=document.getElementById('exercise-rows');
+  if(rows&&rows.querySelectorAll('.exercise-row').length<=2){
+    rows.innerHTML='';
+    const presets=getPresetsForType(sel);
+    // Add 2 exercise rows pre-filled with first 2 presets
+    addExerciseRow();addExerciseRow();
+  }
+}
+
+function getPresetsForType(type){
+  const base=PRESET_EXERCISES[type]||[];
+  // Also get from owner's history
+  const owner=getOwner(currentModalOwner);
+  const historical=new Set();
+  (owner?.trainings||[]).forEach(t=>t.exercises.forEach(e=>historical.add(e.name)));
+  // Merge: historical first (if matching type roughly), then presets
+  const merged=[...base];
+  historical.forEach(n=>{if(!merged.includes(n))merged.push(n);});
+  return merged;
+}
+
+function getSuggestList(type){
+  return getPresetsForType(type||document.getElementById('t-type-sel')?.value||'');
+}
+
+function addExerciseRow(ex){
+  const rows=document.getElementById('exercise-rows');
+  const idx=rows.querySelectorAll('.exercise-row').length;
+  const div=document.createElement('div');div.className='exercise-row';
+  const seriesHtml=ex?.series?.map((s,i)=>makeSeriesRowHtml(i,s.weight,s.reps)).join('')||makeSeriesRowHtml(0,'','')+makeSeriesRowHtml(1,'','');
+  div.innerHTML=`
+    <div class="ex-row-header">
+      <div class="ex-suggest" style="grid-column:1/3">
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px">Název cviku</div>
+        <input type="text" placeholder="Bench press..." class="ex-name-input" autocomplete="off" value="${ex?esc(ex.name):''}"
+          oninput="showSuggest(this)" onblur="hideSuggest(this)" onfocus="showSuggest(this)">
+        <div class="ex-suggest-list"></div>
+      </div>
+      <button class="remove-btn" style="align-self:flex-end" onclick="this.closest('.exercise-row').remove()">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;padding:0 2px">
+      <div class="series-label">Váha (kg)</div>
+      <div class="series-label">Opakování</div>
+    </div>
+    <div class="series-rows">${seriesHtml}</div>
+    <button class="add-series-btn" onclick="addSeriesRow(this)">+ Přidat sérii</button>`;
+  rows.appendChild(div);
+}
+
+function makeSeriesRowHtml(idx,weight,reps){
+  return `<div class="series-row">
+    <div class="series-num">${idx+1}.</div>
+    <input type="number" class="series-input series-weight" placeholder="kg" value="${weight||''}" step="0.5" inputmode="decimal" min="0">
+    <input type="number" class="series-input series-reps" placeholder="opak" value="${reps||''}" inputmode="numeric" min="1">
+    <button class="remove-btn" onclick="removeSeries(this)">✕</button>
+  </div>`;
+}
+
+function addSeriesRow(btn){
+  const seriesRows=btn.previousElementSibling;
+  const idx=seriesRows.querySelectorAll('.series-row').length;
+  // Copy last series weight as default
+  const lastWeight=seriesRows.querySelector('.series-row:last-child .series-weight')?.value||'';
+  const div=document.createElement('div');div.innerHTML=makeSeriesRowHtml(idx,lastWeight,'');
+  seriesRows.appendChild(div.firstElementChild);
+  // Renumber
+  renumberSeries(seriesRows);
+}
+
+function removeSeries(btn){
+  const row=btn.closest('.series-row');
+  const seriesRows=row.parentElement;
+  if(seriesRows.querySelectorAll('.series-row').length<=1)return;
+  row.remove();
+  renumberSeries(seriesRows);
+}
+
+function renumberSeries(container){
+  container.querySelectorAll('.series-row').forEach((r,i)=>{
+    const num=r.querySelector('.series-num');if(num)num.textContent=(i+1)+'.';
+  });
+}
+
+// EXERCISE SUGGEST
+function showSuggest(input){
+  const val=input.value.toLowerCase();
+  const list=input.nextElementSibling;
+  const type=document.getElementById('t-type-sel')?.value||'';
+  const suggestions=getSuggestList(type).filter(s=>s.toLowerCase().includes(val));
+  if(!suggestions.length){list.style.display='none';return;}
+  list.innerHTML=suggestions.slice(0,8).map(s=>`<div class="ex-suggest-item" onmousedown="selectSuggest(this,'${esc(s)}')">${esc(s)}</div>`).join('');
+  list.style.display='block';
+}
+function hideSuggest(input){setTimeout(()=>{const list=input.nextElementSibling;if(list)list.style.display='none';},200);}
+function selectSuggest(item,name){
+  const input=item.closest('.ex-suggest').querySelector('.ex-name-input');
+  input.value=name;
+  item.parentElement.style.display='none';
+}
+
+// ─── SAVE FUNCTIONS ───
+function saveClient(){
+  const name=document.getElementById('f-name').value.trim();if(!name){alert('Zadej jméno');return;}
+  const w=document.getElementById('f-weight').value;
+  const c={id:uid(),name,age:document.getElementById('f-age').value||'',height:document.getElementById('f-height').value||'',weight:w||'',goal:document.getElementById('f-goal').value||'',limitations:document.getElementById('f-lim').value.trim(),photoUrl:document.getElementById('f-photo').value.trim(),trainings:[],weights:w?[{id:uid(),date:today(),weight:w,note:'Vstupní váha'}]:[],inbody:[]};
+  clients.push(c);save();closeModal();renderClientsView();
+}
+function updateClient(){
+  const name=document.getElementById('f-name').value.trim();if(!name){alert('Zadej jméno');return;}
+  const c=clients.find(x=>x.id===currentClientId);
+  c.name=name;c.age=document.getElementById('f-age').value||'';c.height=document.getElementById('f-height').value||'';c.weight=document.getElementById('f-weight').value||'';c.goal=document.getElementById('f-goal').value||'';c.limitations=document.getElementById('f-lim').value.trim();c.photoUrl=document.getElementById('f-photo').value.trim();
+  save();closeModal();renderDetail(currentClientId);
+}
+function editCurrentClient(){openModal('edit-client');}
+function deleteCurrentClient(){const c=clients.find(x=>x.id===currentClientId);if(!confirm(`Smazat klienta ${c.name}?`))return;clients=clients.filter(x=>x.id!==currentClientId);save();showView('clients');}
+function editMeProfile(){openModal('me-profile');}
+
+function openImportMeModal(){
+  if(!clients.length){alert('Nemáš žádné klienty.');return;}
+  const overlay=document.getElementById('modal-overlay');
+  const mc=document.getElementById('modal-content');
+  overlay.classList.add('open');
+  mc.innerHTML=`<div class="modal-handle"></div>
+    <h3>📥 Přenést profil z klientů</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Vyber svoji kartu ze seznamu klientů. Všechny tréninky, váhy a InBody se přesunou do sekce Já. Klientská karta bude smazána.</p>
+    <div class="form-group"><label>Vyber klienta</label>
+      <select id="import-me-select">
+        <option value="">– vyber –</option>
+        ${clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Zrušit</button>
+      <button class="btn btn-primary" onclick="confirmImportMe()">Přenést</button>
+    </div>`;
+}
+
+function confirmImportMe(){
+  const id=document.getElementById('import-me-select').value;
+  if(!id){alert('Vyber klienta');return;}
+  const c=clients.find(x=>x.id===id);
+  if(!confirm(`Přenést profil "${c.name}" do sekce Já? Klientská karta bude smazána.`))return;
+  // Merge data into me
+  if(c.name&&!me.name)me.name=c.name;
+  if(c.age&&!me.age)me.age=c.age;
+  if(c.goal&&!me.goal)me.goal=c.goal;
+  if(c.photoUrl&&!me.photoUrl)me.photoUrl=c.photoUrl;
+  // Merge trainings (append, avoid duplicates by id)
+  const existingIds=new Set((me.trainings||[]).map(t=>t.id));
+  (c.trainings||[]).forEach(t=>{if(!existingIds.has(t.id))me.trainings.push(t);});
+  me.trainings.sort((a,b)=>a.date.localeCompare(b.date));
+  // Merge weights
+  const existingW=new Set((me.weights||[]).map(w=>w.date+'_'+w.weight));
+  (c.weights||[]).forEach(w=>{if(!existingW.has(w.date+'_'+w.weight))me.weights.push(w);});
+  me.weights.sort((a,b)=>a.date.localeCompare(b.date));
+  // Merge inbody
+  const existingIB=new Set((me.inbody||[]).map(e=>e.date));
+  (c.inbody||[]).forEach(e=>{if(!existingIB.has(e.date))me.inbody.push(e);});
+  me.inbody.sort((a,b)=>a.date.localeCompare(b.date));
+  // Remove client
+  clients=clients.filter(x=>x.id!==id);
+  save();
+  closeModal();
+  renderMeView();
+  alert('✅ Profil byl přenesený do sekce Já!');
+}
+function saveMeProfile(){me.name=document.getElementById('mp-name').value.trim();me.age=document.getElementById('mp-age').value||'';me.height=document.getElementById('mp-height').value||'';me.weight=document.getElementById('mp-weight').value||'';me.goal=document.getElementById('mp-goal').value||'';save();closeModal();renderMeView();}
+
+function getExercisesFromModal(){
+  const exercises=[];
+  document.querySelectorAll('.exercise-row').forEach(row=>{
+    const name=row.querySelector('.ex-name-input').value.trim();if(!name)return;
+    const series=[];
+    row.querySelectorAll('.series-row').forEach(sr=>{
+      const w=sr.querySelector('.series-weight').value;
+      const r=sr.querySelector('.series-reps').value;
+      if(w||r)series.push({weight:w||'0',reps:r||'0'});
+    });
+    exercises.push({name,series:series.length?series:[{weight:'0',reps:'0'}]});
+  });
+  return exercises;
+}
+function getTrainingName(){const sel=document.getElementById('t-type-sel').value;return sel==='Vlastní'?document.getElementById('t-name-custom').value.trim():sel;}
+
+function saveTraining(){
+  const exercises=getExercisesFromModal();if(!exercises.length){alert('Přidej alespoň jeden cvik');return;}
+  const ownerId=currentModalOwner;
+  const owner=getOwner(ownerId);if(!owner)return;
+  if(!owner.trainings)owner.trainings=[];
+  owner.trainings.push({id:uid(),name:getTrainingName(),date:document.getElementById('t-date').value,note:document.getElementById('t-note').value.trim(),exercises});
+  save();closeModal();
+  if(ownerId==='__me__')renderTrainings(me,'me-trainings-list','__me__');
+  else renderTrainings(owner,'trainings-list',ownerId);
+}
+function editTraining(index,ownerId){currentEditId=getOwner(ownerId).trainings[index].id;currentModalOwner=ownerId;openModal('edit-training',ownerId);}
+function updateTraining(){
+  const exercises=getExercisesFromModal();if(!exercises.length){alert('Přidej alespoň jeden cvik');return;}
+  const owner=getOwner(currentModalOwner);
+  const t=owner.trainings.find(x=>x.id===currentEditId);
+  t.name=getTrainingName();t.date=document.getElementById('t-date').value;t.note=document.getElementById('t-note').value.trim();t.exercises=exercises;
+  save();closeModal();
+  if(currentModalOwner==='__me__')renderTrainings(me,'me-trainings-list','__me__');
+  else renderTrainings(owner,'trainings-list',currentModalOwner);
+}
+function deleteTraining(index,ownerId){if(!confirm('Smazat trénink?'))return;const o=getOwner(ownerId);o.trainings.splice(index,1);save();if(ownerId==='__me__')renderTrainings(me,'me-trainings-list','__me__');else renderTrainings(o,'trainings-list',ownerId);}
+
+function saveWeight(){
+  const weight=document.getElementById('w-weight').value.trim();if(!weight){alert('Zadej váhu');return;}
+  const o=getOwner(currentModalOwner);if(!o.weights)o.weights=[];
+  o.weights.push({id:uid(),date:document.getElementById('w-date').value,weight,note:document.getElementById('w-note').value.trim()});
+  o.weights.sort((a,b)=>a.date.localeCompare(b.date));
+  save();closeModal();
+  if(currentModalOwner==='__me__'){renderMeView();switchTab('weight','me');}else{renderDetail(currentModalOwner);switchTab('weight','client');}
+}
+function editWeight(wid,ownerId){currentEditId=wid;currentModalOwner=ownerId;openModal('edit-weight',ownerId);}
+function updateWeight(){
+  const weight=document.getElementById('w-weight').value.trim();if(!weight){alert('Zadej váhu');return;}
+  const o=getOwner(currentModalOwner);const w=o.weights.find(x=>x.id===currentEditId);
+  w.date=document.getElementById('w-date').value;w.weight=weight;w.note=document.getElementById('w-note').value.trim();
+  o.weights.sort((a,b)=>a.date.localeCompare(b.date));save();closeModal();
+  if(currentModalOwner==='__me__'){renderMeView();switchTab('weight','me');}else{renderDetail(currentModalOwner);switchTab('weight','client');}
+}
+function saveInBody(){
+  const bw=document.getElementById('ib-bw').value||'';
+  const d={bodyweight:bw,fatPct:document.getElementById('ib-fp').value||'',fatKg:document.getElementById('ib-fk').value||'',muscle:document.getElementById('ib-mu').value||'',water:document.getElementById('ib-wa').value||'',bmi:document.getElementById('ib-bmi').value||'',bmr:document.getElementById('ib-bmr').value||'',note:document.getElementById('ib-note').value.trim()};
+  if(!bw&&!d.fatPct&&!d.muscle&&!d.bmi){alert('Zadej alespoň jeden parametr');return;}
+  const o=getOwner(currentModalOwner);if(!o.inbody)o.inbody=[];
+  const dateVal=document.getElementById('ib-date').value;
+  o.inbody.push({id:uid(),date:dateVal,...d});o.inbody.sort((a,b)=>a.date.localeCompare(b.date));
+  if(bw){if(!o.weights)o.weights=[];const exists=o.weights.find(w=>w.date===dateVal&&w.note==='Z InBody');if(!exists){o.weights.push({id:uid(),date:dateVal,weight:bw,note:'Z InBody'});o.weights.sort((a,b)=>a.date.localeCompare(b.date));}}
+  save();closeModal();
+  if(currentModalOwner==='__me__'){renderMeView();switchTab('inbody','me');}else{renderDetail(currentModalOwner);switchTab('inbody','client');}
+}
+function editInBody(ibId,ownerId){currentEditId=ibId;currentModalOwner=ownerId;openModal('edit-inbody',ownerId);}
+function updateInBody(){
+  const bw=document.getElementById('ib-bw').value||'';
+  const d={bodyweight:bw,fatPct:document.getElementById('ib-fp').value||'',fatKg:document.getElementById('ib-fk').value||'',muscle:document.getElementById('ib-mu').value||'',water:document.getElementById('ib-wa').value||'',bmi:document.getElementById('ib-bmi').value||'',bmr:document.getElementById('ib-bmr').value||'',note:document.getElementById('ib-note').value.trim()};
+  const o=getOwner(currentModalOwner);const e=o.inbody.find(x=>x.id===currentEditId);
+  const oldBw=e.bodyweight;Object.assign(e,{date:document.getElementById('ib-date').value,...d});
+  o.inbody.sort((a,b)=>a.date.localeCompare(b.date));
+  if(bw&&bw!==oldBw){if(!o.weights)o.weights=[];const ex=o.weights.find(w=>w.note==='Z InBody'&&w.date===e.date);if(ex){ex.weight=bw;}else{o.weights.push({id:uid(),date:e.date,weight:bw,note:'Z InBody'});o.weights.sort((a,b)=>a.date.localeCompare(b.date));}}
+  save();closeModal();
+  if(currentModalOwner==='__me__'){renderMeView();switchTab('inbody','me');}else{renderDetail(currentModalOwner);switchTab('inbody','client');}
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+// ─── SEARCH ───
+let clientSearchQuery='';
+function filterClients(q){
+  clientSearchQuery=q.toLowerCase().trim();
+  const clearBtn=document.getElementById('search-clear');
+  if(clearBtn)clearBtn.style.display=clientSearchQuery?'block':'none';
+  renderClientCards();
+}
+function clearSearch(){
+  clientSearchQuery='';
+  const inp=document.getElementById('client-search');
+  if(inp)inp.value='';
+  const clearBtn=document.getElementById('search-clear');
+  if(clearBtn)clearBtn.style.display='none';
+  renderClientCards();
+}
+function renderClientCards(){
+  const filtered=clientSearchQuery?clients.filter(c=>c.name.toLowerCase().includes(clientSearchQuery)):clients;
+  const cards=filtered.map(c=>{
+    const latestWc=getLatestWeight(c);
+    const wDisp=latestWc?latestWc+' kg':'';
+    const initials=c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const avatar=c.photoUrl?`<img src="${esc(c.photoUrl)}" alt="">`:initials;
+    const lastT=c.trainings?.slice(-1)[0];
+    return `<div class="client-card" id="card-${c.id}" draggable="true"
+      ondragstart="dragStart(event,'${c.id}')" ondragover="dragOver(event,'${c.id}')"
+      ondragleave="dragLeave(event,'${c.id}')" ondrop="dragDrop(event,'${c.id}')" ondragend="dragEnd()">
+      <div class="card-top">
+        <span class="drag-handle" ontouchstart="touchDragStart(event,'${c.id}')" ontouchmove="touchDragMove(event)" ontouchend="touchDragEnd(event)">⠿</span>
+        <div class="avatar" onclick="showDetail('${c.id}')">${avatar}</div>
+        <div style="flex:1;min-width:0" onclick="showDetail('${c.id}')">
+          <div class="client-name">${esc(c.name)}</div>
+          <div class="client-meta">${[c.age?c.age+' let':'',c.height?c.height+'cm':'',wDisp].filter(Boolean).join(' · ')}</div>
+        </div>
+      </div>
+      <div class="client-tags" onclick="showDetail('${c.id}')">
+        ${c.goal?`<span class="tag tag-goal">${esc(c.goal)}</span>`:''}
+        ${c.limitations?`<span class="tag tag-warn">⚠ Omezení</span>`:''}
+      </div>
+      <div class="card-footer" onclick="showDetail('${c.id}')">
+        <div style="font-size:.74rem;color:var(--muted)">${lastT?`Poslední: <strong style="color:var(--text)">${fmtDate(lastT.date)}</strong>`:'Žádný trénink'}</div>
+        <span style="font-size:.72rem;color:var(--muted)">${c.trainings?.length||0} →</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('clients-grid').innerHTML=cards+(!clientSearchQuery?`<div class="add-card" onclick="openModal('client')"><div class="plus">+</div><span>Přidat klienta</span></div>`:'');
+}
+
+// ─── TEMPLATES ───
+function getTemplates(){
+  try{return JSON.parse(localStorage.getItem('pt_templates')||'[]');}catch(e){return[];}
+}
+function saveTemplates(t){localStorage.setItem('pt_templates',JSON.stringify(t));}
+
+function renderTemplateChips(){
+  const wrap=document.getElementById('templates-chips');
+  if(!wrap)return;
+  const templates=getTemplates();
+  if(!templates.length){wrap.innerHTML=`<span style="font-size:.78rem;color:var(--muted)">Zatím žádné šablony. Ulož trénink jako šablonu tlačítkem níže.</span>`;return;}
+  wrap.innerHTML=templates.map((t,i)=>`
+    <span class="template-chip" onclick="loadTemplate(${i})">
+      ${esc(t.name||'Šablona '+(i+1))}
+      <span class="tc-del" onclick="event.stopPropagation();deleteTemplate(${i})">✕</span>
+    </span>`).join('');
+}
+
+function loadTemplate(idx){
+  const t=getTemplates()[idx];
+  if(!t)return;
+  // Set training type
+  const sel=document.getElementById('t-type-sel');
+  if(sel){
+    const isPreset=[...sel.options].some(o=>o.value===t.name);
+    sel.value=isPreset?t.name:'Vlastní';
+    if(!isPreset){
+      const custom=document.getElementById('t-name-custom');
+      if(custom){custom.style.display='block';custom.value=t.name||'';}
+    }
+  }
+  // Clear and fill exercises
+  const rows=document.getElementById('exercise-rows');
+  if(rows){rows.innerHTML='';t.exercises.forEach(ex=>addExerciseRow(ex));}
+  // Note
+  const noteEl=document.getElementById('t-note');
+  if(noteEl&&t.note)noteEl.value=t.note;
+}
+
+function saveAsTemplate(){
+  const exercises=getExercisesFromModal();
+  if(!exercises.length){alert('Přidej alespoň jeden cvik');return;}
+  const name=getTrainingName()||'Šablona';
+  const templates=getTemplates();
+  // Check duplicate name
+  if(templates.some(t=>t.name===name)){
+    if(!confirm(`Šablona "${name}" už existuje. Přepsat?`))return;
+    const idx=templates.findIndex(t=>t.name===name);
+    templates[idx]={name,exercises};
+  } else {
+    templates.push({name,exercises});
+  }
+  saveTemplates(templates);
+  renderTemplateChips();
+  // Visual feedback
+  const btn=document.querySelector('.modal-actions .btn-ghost.btn-sm');
+  if(btn){const orig=btn.textContent;btn.textContent='✅ Uloženo!';setTimeout(()=>btn.textContent=orig,1500);}
+}
+
+function deleteTemplate(idx){
+  const templates=getTemplates();
+  const name=templates[idx]?.name||'tuto šablonu';
+  if(!confirm(`Smazat šablonu "${name}"?`))return;
+  templates.splice(idx,1);
+  saveTemplates(templates);
+  renderTemplateChips();
+}
+
+// ─── REPEAT TRAINING ───
+function repeatTraining(index,ownerId){
+  const owner=getOwner(ownerId);
+  const t=owner.trainings[index];
+  if(!confirm(`Zopakovat trénink "${t.name||fmtDate(t.date)}" na dnešní datum?`))return;
+  const copy={
+    id:uid(),
+    name:t.name,
+    date:today(),
+    note:t.note||'',
+    exercises:t.exercises.map(ex=>({
+      name:ex.name,
+      series:(ex.series||[]).map(s=>({weight:s.weight,reps:s.reps}))
+    }))
+  };
+  if(!owner.trainings)owner.trainings=[];
+  owner.trainings.push(copy);
+  owner.trainings.sort((a,b)=>a.date.localeCompare(b.date));
+  save();
+  if(ownerId==='__me__')renderTrainings(me,'me-trainings-list','__me__');
+  else renderTrainings(owner,'trainings-list',ownerId);
+  // Brief toast
+  showToast('✅ Trénink zkopírován na dnešek!');
+}
+
+// ─── TOAST ───
+function showToast(msg,duration){
+  let toast=document.getElementById('toast');
+  if(!toast){toast=document.createElement('div');toast.id='toast';toast.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:20px;font-size:.85rem;z-index:2000;pointer-events:none;transition:opacity .3s;white-space:nowrap';document.body.appendChild(toast);}
+  toast.textContent=msg;toast.style.opacity='1';
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>toast.style.opacity='0',duration||2000);
+}
+
+// ─── DRAG & DROP ───
+let dragId=null;
+function dragStart(e,id){dragId=id;document.getElementById('card-'+id)?.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function dragOver(e,id){e.preventDefault();if(id!==dragId)document.getElementById('card-'+id)?.classList.add('drag-over');}
+function dragLeave(e,id){document.getElementById('card-'+id)?.classList.remove('drag-over');}
+function dragEnd(){document.querySelectorAll('.client-card').forEach(c=>c.classList.remove('dragging','drag-over'));dragId=null;}
+function dragDrop(e,targetId){e.preventDefault();dragLeave(e,targetId);if(!dragId||dragId===targetId)return;const fi=clients.findIndex(c=>c.id===dragId);const ti=clients.findIndex(c=>c.id===targetId);if(fi<0||ti<0)return;const[moved]=clients.splice(fi,1);clients.splice(ti,0,moved);save();renderClientsView();}
+let touchDragId=null;
+function touchDragStart(e,id){touchDragId=id;document.getElementById('card-'+id)?.classList.add('dragging');e.stopPropagation();}
+function touchDragMove(e){if(!touchDragId)return;e.preventDefault();const touch=e.touches[0];const el=document.elementFromPoint(touch.clientX,touch.clientY);const tc=el?.closest('.client-card');document.querySelectorAll('.client-card').forEach(c=>c.classList.remove('drag-over'));if(tc&&tc.id!=='card-'+touchDragId)tc.classList.add('drag-over');}
+function touchDragEnd(e){if(!touchDragId)return;const touch=e.changedTouches[0];const el=document.elementFromPoint(touch.clientX,touch.clientY);const tc=el?.closest('.client-card');document.querySelectorAll('.client-card').forEach(c=>c.classList.remove('dragging','drag-over'));if(tc){const tid=tc.id.replace('card-','');if(tid&&tid!==touchDragId){const fi=clients.findIndex(c=>c.id===touchDragId);const ti=clients.findIndex(c=>c.id===tid);if(fi>=0&&ti>=0){const[m]=clients.splice(fi,1);clients.splice(ti,0,m);save();renderClientsView();}}}touchDragId=null;}
+
+// ─── STATISTICS ───
+function destroyStatsCharts(){statsCharts.forEach(c=>{try{c.destroy();}catch(e){}});statsCharts=[];}
+function switchStatsTab(tab){
+  currentStatsTab=tab;
+  document.querySelectorAll('.stats-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='performance')||(i===1&&tab==='inbody')));
+  const id=document.getElementById('stats-client-select').value;if(id)renderStatsContent(id);
+}
+function setPeriod(period){
+  currentPeriod=period;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.toggle('active',b.dataset&&b.dataset.period===period));
+  const cp=document.getElementById('custom-period');if(cp)cp.classList.toggle('visible',period==='custom');
+  if(period!=='custom'){const id=document.getElementById('stats-client-select').value;if(id)renderStatsContent(id);}
+}
+function applyCustomPeriod(){customFrom=document.getElementById('custom-from').value;customTo=document.getElementById('custom-to').value;const id=document.getElementById('stats-client-select').value;if(id)renderStatsContent(id);}
+function filterByPeriod(items,key){
+  if(currentPeriod==='all')return items;
+  if(currentPeriod==='custom')return items.filter(i=>(!customFrom||i[key]>=customFrom)&&(!customTo||i[key]<=customTo));
+  const months={'1m':1,'3m':3,'6m':6}[currentPeriod]||1;
+  const now=new Date();const cutoff=new Date(now.getFullYear(),now.getMonth()-months,now.getDate()).toISOString().slice(0,10);
+  return items.filter(i=>i[key]>=cutoff);
+}
+
+function renderStatsPage(){
+  const sel=document.getElementById('stats-client-select');
+  const val=sel.value;
+  // Options: Já + all clients
+  sel.innerHTML='<option value="">– vyber –</option>'
+    +`<option value="__me__" ${val==='__me__'?'selected':''}>🏋️ Já (${me.name||'vlastní tréninky'})</option>`
+    +clients.map(c=>`<option value="${c.id}" ${c.id===val?'selected':''}>${esc(c.name)}</option>`).join('');
+  document.querySelectorAll('.stats-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&currentStatsTab==='performance')||(i===1&&currentStatsTab==='inbody')));
+  if(val){document.getElementById('stats-tabs').style.display='flex';renderStatsContent(val);}
+  else{document.getElementById('stats-tabs').style.display='none';document.getElementById('stats-content').innerHTML=`<div class="stats-empty"><div class="big">📊</div><p>Vyber klienta nebo Já.</p></div>`;}
+}
+function onStatsClientChange(){const id=document.getElementById('stats-client-select').value;if(!id){document.getElementById('stats-tabs').style.display='none';document.getElementById('stats-content').innerHTML=`<div class="stats-empty"><div class="big">📊</div><p>Vyber klienta.</p></div>`;return;}document.getElementById('stats-tabs').style.display='flex';renderStatsContent(id);}
+function renderStatsContent(ownerId){
+  destroyStatsCharts();
+  const owner=getOwner(ownerId);if(!owner)return;
+  document.querySelectorAll('.stats-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&currentStatsTab==='performance')||(i===1&&currentStatsTab==='inbody')));
+  const periodHtml=`
+    <div class="period-filter">
+      <button class="period-btn ${currentPeriod==='1m'?'active':''}" data-period="1m" onclick="setPeriod('1m')">1M</button>
+      <button class="period-btn ${currentPeriod==='3m'?'active':''}" data-period="3m" onclick="setPeriod('3m')">3M</button>
+      <button class="period-btn ${currentPeriod==='6m'?'active':''}" data-period="6m" onclick="setPeriod('6m')">6M</button>
+      <button class="period-btn ${currentPeriod==='all'?'active':''}" data-period="all" onclick="setPeriod('all')">Vše</button>
+      <button class="period-btn ${currentPeriod==='custom'?'active':''}" data-period="custom" onclick="setPeriod('custom')">Vlastní</button>
+    </div>
+    <div class="custom-period ${currentPeriod==='custom'?'visible':''}" id="custom-period">
+      <span>Od</span><input type="date" id="custom-from" value="${customFrom}">
+      <span>Do</span><input type="date" id="custom-to" value="${customTo}">
+      <button class="btn btn-primary btn-sm" onclick="applyCustomPeriod()">Použít</button>
+    </div>`;
+  if(currentStatsTab==='performance')renderPerfStats(owner,periodHtml,ownerId);
+  else renderIbStats(owner,periodHtml);
+}
+
+function mkChart(id,type,labels,datasets,opts){
+  const el=document.getElementById(id);if(!el)return null;
+  const ch=new Chart(el.getContext('2d'),{type,data:{labels,datasets},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#222',bodyColor:'#f0f0f0',borderColor:'#2e2e2e',borderWidth:1,...(opts.tooltip||{})}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#888',font:{size:10},...(opts.yticks||{})},grid:{color:'#1e1e1e'}}}}});
+  statsCharts.push(ch);return ch;
+}
+
+function renderPerfStats(owner,periodHtml,ownerId){
+  const trainings=filterByPeriod(owner.trainings||[],'date');
+  if(!trainings.length){document.getElementById('stats-content').innerHTML=periodHtml+`<div class="stats-empty"><div class="big">🏋️</div><p>Žádné tréninky v tomto období.</p></div>`;return;}
+  const names=[...new Set(trainings.flatMap(t=>t.exercises.map(e=>e.name)))].sort();
+  const vData=trainings.map(t=>({
+    date:t.date,
+    vol:t.exercises.reduce((s,e)=>{
+      const series=e.series||[{weight:e.weight||0,reps:e.reps||1}];
+      return s+series.reduce((ss,sr)=>ss+(parseFloat(sr.weight)||0)*(parseInt(sr.reps)||1),0);
+    },0)
+  })).sort((a,b)=>a.date.localeCompare(b.date));
+  const totVol=vData.reduce((s,d)=>s+d.vol,0);
+  const maxVol=Math.max(...vData.map(d=>d.vol));
+  document.getElementById('stats-content').innerHTML=periodHtml+`
+    <div class="stats-best">
+      <div class="stats-best-block"><div class="stats-best-label">Celkový objem</div><div class="stats-best-value">${Math.round(totVol/1000)}t</div><div class="stats-best-sub">${Math.round(totVol).toLocaleString('cs')} kg</div></div>
+      <div class="stats-best-block"><div class="stats-best-label">Nejlepší trénink</div><div class="stats-best-value">${Math.round(maxVol/1000*10)/10}t</div><div class="stats-best-sub">${fmtDateShort(vData.find(d=>d.vol===maxVol)?.date)}</div></div>
+    </div>
+    <div class="stats-chart-card"><div class="stats-chart-title">Objem tréninku v čase</div><div class="stats-chart-sub">kg × opakování</div><canvas id="chart-volume" height="200"></canvas></div>
+    <div class="stats-exercise-picker"><label>Progrese cviku</label>
+      <select id="stats-ex-select" onchange="renderExChart('${ownerId}')"><option value="">– vyber cvik –</option>${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>
+    </div>
+    <div id="exercise-chart-wrap"></div>`;
+  mkChart('chart-volume','bar',vData.map(d=>fmtDateShort(d.date)),[{data:vData.map(d=>Math.round(d.vol)),backgroundColor:'rgba(200,241,53,.25)',borderColor:'#c8f135',borderWidth:2,borderRadius:6}],{tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y.toLocaleString('cs')} kg`}},yticks:{callback:v=>v>=1000?Math.round(v/1000)+'t':v+'kg'}});
+  if(names.length){document.getElementById('stats-ex-select').value=names[0];renderExChart(ownerId);}
+}
+
+function renderExChart(ownerId){
+  const exName=document.getElementById('stats-ex-select').value;
+  const wrap=document.getElementById('exercise-chart-wrap');
+  if(!exName){wrap.innerHTML='';return;}
+  const owner=getOwner(ownerId);
+  const pts=filterByPeriod(owner.trainings||[],'date').filter(t=>t.exercises.some(e=>e.name===exName)).map(t=>{
+    const ex=t.exercises.find(e=>e.name===exName);
+    // Max weight used in any series
+    const maxW=ex.series?Math.max(...ex.series.map(s=>parseFloat(s.weight)||0)):parseFloat(ex.weight)||0;
+    return{date:t.date,w:maxW};
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!pts.length){wrap.innerHTML='';return;}
+  const maxW=Math.max(...pts.map(p=>p.w));
+  const diff=(pts[pts.length-1].w-pts[0].w).toFixed(1);
+  const diffStr=diff>0?`+${diff}`:String(diff);
+  const diffColor=diff>0?'#4ade80':diff<0?'#ff7a5c':'#888';
+  const oldCh=Chart.getChart(document.getElementById('chart-exercise'));if(oldCh){oldCh.destroy();statsCharts=statsCharts.filter(x=>x!==oldCh);}
+  wrap.innerHTML=`
+    <div class="stats-best">
+      <div class="stats-best-block"><div class="stats-best-label">Maximum</div><div class="stats-best-value">${maxW} kg</div><div class="stats-best-sub">${fmtDateShort(pts.find(p=>p.w===maxW)?.date)}</div></div>
+      <div class="stats-best-block"><div class="stats-best-label">Progrese</div><div class="stats-best-value" style="color:${diffColor}">${diffStr} kg</div></div>
+    </div>
+    <div class="stats-chart-card"><div class="stats-chart-title">${esc(exName)}</div><div class="stats-chart-sub">Max váha v sérii</div><canvas id="chart-exercise" height="200"></canvas></div>`;
+  mkChart('chart-exercise','line',pts.map(p=>fmtDateShort(p.date)),[{data:pts.map(p=>p.w),borderColor:'#c8f135',backgroundColor:'rgba(200,241,53,.08)',pointBackgroundColor:'#c8f135',pointBorderColor:'#0f0f0f',pointBorderWidth:2,pointRadius:5,tension:.3,fill:true}],{tooltip:{titleColor:'#c8f135',callbacks:{label:ctx=>` ${ctx.parsed.y} kg`}},yticks:{callback:v=>v+' kg'}});
+}
+
+function renderIbStats(owner,periodHtml){
+  const inbody=filterByPeriod(owner.inbody||[],'date');
+  const weights=filterByPeriod(owner.weights||[],'date');
+  if(!inbody.length&&!weights.length){document.getElementById('stats-content').innerHTML=periodHtml+`<div class="stats-empty"><div class="big">📋</div><p>Žádná InBody data v tomto období.</p></div>`;return;}
+  document.getElementById('stats-content').innerHTML=periodHtml+`<div id="ib-charts"></div>`;
+  const ib=[...inbody].sort((a,b)=>a.date.localeCompare(b.date));
+  const ws=[...weights].sort((a,b)=>a.date.localeCompare(b.date));
+  const wrap=document.getElementById('ib-charts');
+  function addChart(canvasId,title,sub,color,labels,data,unit){
+    const card=document.createElement('div');card.className='stats-chart-card';
+    card.innerHTML=`<div class="stats-chart-title">${title}</div><div class="stats-chart-sub">${sub}</div><canvas id="${canvasId}" height="160"></canvas>`;
+    wrap.appendChild(card);
+    mkChart(canvasId,'line',labels,[{data,borderColor:color,backgroundColor:color+'22',pointBackgroundColor:color,pointBorderColor:'#0f0f0f',pointBorderWidth:2,pointRadius:5,tension:.3,fill:true,spanGaps:true}],{tooltip:{titleColor:color,callbacks:{label:ctx=>` ${ctx.parsed.y}${unit}`}},yticks:{callback:v=>v+unit}});
+  }
+  if(ws.length>=2)addChart('ibc-weight','Tělesná váha','kg v čase','#c8f135',ws.map(w=>fmtDateShort(w.date)),ws.map(w=>parseFloat(w.weight)),' kg');
+  [{key:'fatPct',title:'Tělesný tuk %',unit:'%',color:'#ff7a5c'},{key:'muscle',title:'Svalová hmota',unit:' kg',color:'#4ade80'},{key:'fatKg',title:'Tuk kg',unit:' kg',color:'#fc9867'},{key:'water',title:'Voda v těle',unit:' kg',color:'#38bdf8'},{key:'bmi',title:'BMI',unit:'',color:'#a78bfa'},{key:'bmr',title:'BMR',unit:' kcal',color:'#fb7185'}]
+    .filter(cfg=>ib.some(e=>e[cfg.key])).forEach(cfg=>addChart(`ibc-${cfg.key}`,cfg.title,cfg.unit.trim()||'hodnota',cfg.color,ib.map(e=>fmtDateShort(e.date)),ib.map(e=>e[cfg.key]?parseFloat(e[cfg.key]):null),cfg.unit));
+}
+
+// ─── DATA ───
+function showDataModal(){
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-content').innerHTML=`<div class="modal-handle"></div><h3>💾 Správa dat</h3>
+    <div class="data-section"><h4>📤 Export zálohy</h4><p>Stáhni všechna data jako JSON soubor.</p><button class="btn btn-primary btn-sm" onclick="exportData()">⬇ Stáhnout zálohu</button></div>
+    <div class="data-section"><h4>📥 Import zálohy</h4><p>Načti zálohu ze souboru. <strong style="color:#ff7a5c">Přepíše stávající data!</strong></p><input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📁 Vybrat soubor</button></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Zavřít</button></div>`;
+}
+function exportData(){const json=JSON.stringify({version:2,exportedAt:new Date().toISOString(),clients,me},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`PTManager_zaloha_${today()}.json`;a.click();URL.revokeObjectURL(url);}
+function importData(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const data=JSON.parse(e.target.result);if(data.version===2){if(!confirm(`Importovat data?`))return;clients=data.clients||[];me=data.me||me;}else{const imported=data.clients||data;if(!Array.isArray(imported))throw new Error();if(!confirm(`Importovat ${imported.length} klientů?`))return;clients=imported;}save();closeModal();goHome();alert('✅ Import OK!');}catch(err){alert('❌ Nepodařilo se načíst soubor.');}};reader.readAsText(file);}
+
+// ─── INIT ───
+renderHome();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</body>
+</html>
